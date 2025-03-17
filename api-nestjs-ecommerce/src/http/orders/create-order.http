@@ -1,0 +1,9 @@
+### create new order
+POST http://localhost:3000/orders
+Content-Type: application/json
+
+{
+  "productIds": ["67d48bbb190d2a907a77662a"],
+  "total": 10,
+  "date": "2025-01-01 10:15:33"
+}

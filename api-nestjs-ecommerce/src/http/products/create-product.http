@@ -1,0 +1,11 @@
+### create new product
+POST http://localhost:3000/products
+Content-Type: application/json
+
+{
+  "name": "Porta CoposII",
+  "description": "Ótimo para guardar copos",
+  "price": 10.10,
+  "categoryIds": [],
+  "imageUrl": "www.google.com/"
+}

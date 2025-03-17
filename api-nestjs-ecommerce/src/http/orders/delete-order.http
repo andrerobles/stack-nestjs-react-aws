@@ -1,0 +1,2 @@
+### get order by id
+DELETE http://localhost:3000/orders/67d491f4190d2a907a776658

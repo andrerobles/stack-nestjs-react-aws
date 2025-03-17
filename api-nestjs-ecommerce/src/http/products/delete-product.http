@@ -1,0 +1,2 @@
+### delete product
+DELETE http://localhost:3000/products/67d48c5f190d2a907a77662e

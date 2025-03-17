@@ -1,0 +1,2 @@
+### get category by id
+GET http://localhost:3000/categories/67d4901d190d2a907a77663d

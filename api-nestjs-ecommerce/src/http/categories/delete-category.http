@@ -1,0 +1,2 @@
+### delete category
+DELETE http://localhost:3000/categories/67d4907f190d2a907a776641

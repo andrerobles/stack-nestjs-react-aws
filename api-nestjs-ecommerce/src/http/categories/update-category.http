@@ -1,0 +1,7 @@
+### update a existence category
+PATCH http://localhost:3000/categories/67d4901d190d2a907a77663d
+Content-Type: application/json
+
+{
+  "name": "Cozinha"
+}

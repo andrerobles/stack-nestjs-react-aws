@@ -1,0 +1,97 @@
+# compiled output
+/api-nestjs-ecommerce/dist
+/api-nestjs-ecommerce/node_modules
+/api-nestjs-ecommerce/build
+
+# Logs
+/api-nestjs-ecommerce/logs
+/api-nestjs-ecommerce/*.log
+/api-nestjs-ecommerce/npm-debug.log*
+/api-nestjs-ecommerce/pnpm-debug.log*
+/api-nestjs-ecommerce/yarn-debug.log*
+/api-nestjs-ecommerce/yarn-error.log*
+/api-nestjs-ecommerce/lerna-debug.log*
+
+# OS
+/api-nestjs-ecommerce/.DS_Store
+
+# Tests
+/api-nestjs-ecommerce/coverage
+/api-nestjs-ecommerce/.nyc_output
+
+# IDEs and editors
+/api-nestjs-ecommerce/.idea
+/api-nestjs-ecommerce/.project
+/api-nestjs-ecommerce/.classpath
+/api-nestjs-ecommerce/.c9/
+/api-nestjs-ecommerce/*.launch
+/api-nestjs-ecommerce/.settings/
+/api-nestjs-ecommerce/*.sublime-workspace
+
+# IDE - VSCode
+/api-nestjs-ecommerce/.vscode/*
+/api-nestjs-ecommerce/!.vscode/settings.json
+/api-nestjs-ecommerce/!.vscode/tasks.json
+/api-nestjs-ecommerce/!.vscode/launch.json
+/api-nestjs-ecommerce/!.vscode/extensions.json
+
+# dotenv environment variable files
+/api-nestjs-ecommerce/.env
+/api-nestjs-ecommerce/.env.development.local
+/api-nestjs-ecommerce/.env.test.local
+/api-nestjs-ecommerce/.env.production.local
+/api-nestjs-ecommerce/.env.local
+
+# temp directory
+/api-nestjs-ecommerce/.temp
+/api-nestjs-ecommerce/.tmp
+
+# Runtime data
+/api-nestjs-ecommerce/pids
+/api-nestjs-ecommerce/*.pid
+/api-nestjs-ecommerce/*.seed
+/api-nestjs-ecommerce/*.pid.lock
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+/api-nestjs-ecommerce/report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Documents
+/api-nestjs-ecommerce/doc/
+
+# Logs
+/app-react-ecommerce/logs
+/app-react-ecommerce/*.log
+/app-react-ecommerce/npm-debug.log*
+/app-react-ecommerce/yarn-debug.log*
+/app-react-ecommerce/yarn-error.log*
+/app-react-ecommerce/pnpm-debug.log*
+/app-react-ecommerce/lerna-debug.log*
+
+/app-react-ecommerce/node_modules
+/app-react-ecommerce/dist
+/app-react-ecommerce/dist-ssr
+/app-react-ecommerce/*.local
+
+# Editor directories and files
+/app-react-ecommerce/.vscode/*
+/app-react-ecommerce/!.vscode/extensions.json
+/app-react-ecommerce/.idea
+/app-react-ecommerce/.DS_Store
+/app-react-ecommerce/*.suo
+/app-react-ecommerce/*.ntvs*
+/app-react-ecommerce/*.njsproj
+/app-react-ecommerce/*.sln
+/app-react-ecommerce/*.sw?
+
+/app-react-ecommerce/*storybook.log
+
+# package directories
+/serverless-ecommerce/node_modules
+/serverless-ecommerce/jspm_packages
+
+# Serverless directories
+/serverless-ecommerce/.serverless
+
+# esbuild directories
+/serverless-ecommerce/.esbuild
+/serverless-ecommerce/.build

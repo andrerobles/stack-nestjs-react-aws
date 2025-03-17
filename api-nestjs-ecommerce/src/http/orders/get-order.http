@@ -1,0 +1,2 @@
+### get order by id
+GET http://localhost:3000/orders/67d4918f190d2a907a776651

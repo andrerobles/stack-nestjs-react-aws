@@ -1,0 +1,2 @@
+### get list of orders
+GET http://localhost:3000/orders

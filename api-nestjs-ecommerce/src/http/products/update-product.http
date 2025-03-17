@@ -1,0 +1,11 @@
+### update a existence product
+PATCH http://localhost:3000/products/67d48bbb190d2a907a77662a
+Content-Type: application/json
+
+{
+  "name": "Porta Copos",
+  "description": "Ótimo para guardar copos",
+  "price": 10.11,
+  "categoryIds": ["67d490ad190d2a907a776646"],
+  "imageUrl": "www.google.com/"
+}
