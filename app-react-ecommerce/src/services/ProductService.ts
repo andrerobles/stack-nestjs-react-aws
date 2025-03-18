@@ -1,39 +1,131 @@
-import { mockProducts } from "../assets/mocks/ProductMock";
-import { Product } from "../models/Product";
+import axios from "axios";
+import { Product, ProductSchema } from "../models/Product";
+import { convertCategoriesToString } from "../models/Category";
+
+const API_URL = import.meta.env.REACT_APP_API_URL || "http://localhost:3000";
+
+const api = axios.create({
+	baseURL: API_URL,
+	headers: {
+		"Content-Type": "application/json",
+	},
+});
 
 export const ProductService = {
-	getAll: (): Promise<Product[]> => {
-		return Promise.resolve(mockProducts);
-	},
+	getAll: async (): Promise<Product[] | undefined> => {
+		try {
+			const response = await api.get("/products");
 
-	getById: (id: number): Promise<Product | undefined> => {
-		const product = mockProducts.find((p) => p.id === id);
-		return Promise.resolve(product);
-	},
-
-	create: (product: Omit<Product, "id">): Promise<Product> => {
-		// Simulando geração de ID
-		const newId = Math.max(...mockProducts.map((p) => p.id)) + 1;
-		const newProduct = { ...product, id: newId };
-		mockProducts.push(newProduct);
-		return Promise.resolve(newProduct);
-	},
-
-	update: (product: Product): Promise<Product> => {
-		const index = mockProducts.findIndex((p) => p.id === product.id);
-		if (index !== -1) {
-			mockProducts[index] = product;
-			return Promise.resolve(product);
+			if (response.data) {
+				const productsResponse: ProductSchema[] = response.data;
+				// Adapta retorno para o padrão
+				return productsResponse.map((product: ProductSchema) => ({
+					id: product._id,
+					name: product.name,
+					description: product.description,
+					price: product.price,
+					categories: convertCategoriesToString(product.categoryIds),
+					imageUrl: product.imageUrl,
+				}));
+			}
+		} catch (error) {
+			console.error("Failed to fetch products:", error);
+			throw error;
 		}
-		return Promise.reject(new Error("Product not found"));
 	},
 
-	delete: (id: number): Promise<boolean> => {
-		const index = mockProducts.findIndex((p) => p.id === id);
-		if (index !== -1) {
-			mockProducts.splice(index, 1);
-			return Promise.resolve(true);
+	// O método getById também deve formatar o resultado
+	getById: async (id: string): Promise<Product | undefined> => {
+		try {
+			const response = await api.get(`/products/${id}`);
+			if (response.data) {
+				if (response.data) {
+					const productResponse: ProductSchema = response.data;
+					return {
+						id: productResponse._id,
+						name: productResponse.name,
+						price: productResponse.price,
+						description: productResponse.description,
+						categories: convertCategoriesToString(productResponse.categoryIds),
+						imageUrl: productResponse.imageUrl,
+					};
+				}
+			}
+		} catch (error) {
+			if (axios.isAxiosError(error) && error.response?.status === 404) {
+				return undefined;
+			}
+			console.error(`Failed to fetch category with id ${id}:`, error);
+			throw error;
 		}
-		return Promise.reject(new Error("Product not found"));
+	},
+
+	// O método create deve enviar apenas o name e formatar o resultado
+	create: async (
+		product: Omit<Product, "id">
+	): Promise<Product | undefined> => {
+		try {
+			const response = await api.post("/product", {
+				name: product.name,
+				description: product.description,
+				price: product.price,
+				categoryIds: product.categories,
+				imageUrl: product.imageUrl,
+			});
+			if (response.data) {
+				const productResponse: ProductSchema = response.data;
+				return {
+					id: productResponse._id,
+					name: productResponse.name,
+					description: productResponse.description,
+					price: productResponse.price,
+					categories: convertCategoriesToString(productResponse.categoryIds),
+					imageUrl: productResponse.imageUrl,
+				};
+			}
+		} catch (error) {
+			console.error("Failed to create category:", error);
+			throw error;
+		}
+	},
+
+	update: async (
+		id: string,
+		product: Partial<ProductSchema>
+	): Promise<Product | undefined> => {
+		try {
+			const response = await api.patch(`/categories/${id}`, {
+				name: product.name,
+				description: product.description,
+				price: product.price,
+				categoryIds: product.categoryIds,
+				imageUrl: product.imageUrl,
+			});
+
+			if (response.data) {
+				const productResponse: ProductSchema = response.data;
+				return {
+					id: productResponse._id,
+					name: productResponse.name,
+					description: productResponse.description,
+					price: productResponse.price,
+					categories: convertCategoriesToString(productResponse.categoryIds),
+					imageUrl: productResponse.imageUrl,
+				};
+			}
+		} catch (error) {
+			console.error(`Failed to update category with id ${id}:`, error);
+			throw error;
+		}
+	},
+
+	delete: async (id: string): Promise<boolean> => {
+		try {
+			await api.delete(`/products/${id}`);
+			return true;
+		} catch (error) {
+			console.error(`Failed to delete product with id ${id}:`, error);
+			throw error;
+		}
 	},
 };

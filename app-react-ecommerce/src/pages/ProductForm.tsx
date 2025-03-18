@@ -5,23 +5,23 @@ import GenericForm from "../components/GenericForm";
 
 interface ProductFormProps {
 	open: boolean;
-	product: Product | null;
+	item: Product | null;
 	onClose: () => void;
-	onSubmit: (product: Product) => void;
+	onSubmit: (product: Product) => Promise<void>;
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({
 	open,
-	product,
+	item,
 	onClose,
 	onSubmit,
 }) => {
 	const getEmptyProduct = (): Product => ({
-		id: 0,
+		id: "",
 		name: "",
 		description: "",
 		price: 0,
-		categoryName: "",
+		categories: "",
 		imageUrl: "",
 	});
 
@@ -38,7 +38,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
 					onChange={handleChange}
 					fullWidth
 					required
-					// Comentário em português: Campo para nome do produto
 				/>
 			</Grid>
 			<Grid item xs={12}>
@@ -51,7 +50,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
 					multiline
 					rows={3}
 					required
-					// Comentário em português: Descrição detalhada do produto
 				/>
 			</Grid>
 			<Grid item xs={6}>
@@ -63,19 +61,17 @@ const ProductForm: React.FC<ProductFormProps> = ({
 					onChange={handleChange}
 					fullWidth
 					required
-					inputProps={{ min: 0, step: 0.01 }}
-					// Comentário em português: Preço do produto
+					inputProps={{ min: 0, step: 1 }}
 				/>
 			</Grid>
 			<Grid item xs={6}>
 				<TextField
 					name="categoryName"
 					label="Category"
-					value={formData.categoryName}
+					value={formData.categories}
 					onChange={handleChange}
 					fullWidth
 					required
-					// Comentário em português: Categoria do produto
 				/>
 			</Grid>
 			<Grid item xs={12}>
@@ -85,7 +81,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
 					value={formData.imageUrl}
 					onChange={handleChange}
 					fullWidth
-					// Comentário em português: URL da imagem do produto
 				/>
 			</Grid>
 		</>
@@ -95,7 +90,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 		<GenericForm<Product>
 			open={open}
 			title="Product"
-			item={product}
+			item={item}
 			onClose={onClose}
 			onSubmit={onSubmit}
 			renderFields={renderProductFields}

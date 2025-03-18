@@ -1,4 +1,3 @@
-// src/components/category/CategoryTable.tsx
 import React from "react";
 import GenericTable, { Column } from "../components/GenericTable";
 import { Category } from "../models/Category";
@@ -22,8 +21,12 @@ const CategoryTable: React.FC = () => {
 				const { id, ...categoryWithoutId } = category;
 				await CategoryService.create(categoryWithoutId);
 			}}
-			updateItem={CategoryService.update}
-			deleteItem={CategoryService.delete}
+			updateItem={async (category) => {
+				await CategoryService.update(category.id, category);
+			}}
+			deleteItem={async (id) => {
+				await CategoryService.delete(id);
+			}}
 			getItemId={(category) => category.id}
 			FormComponent={CategoryForm}
 		/>

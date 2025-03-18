@@ -6,19 +6,19 @@ import GenericForm from "../components/GenericForm";
 
 interface CategoryFormProps {
 	open: boolean;
-	category: Category | null;
+	item: Category | null;
 	onClose: () => void;
-	onSubmit: (category: Category) => void;
+	onSubmit: (category: Category) => Promise<void>;
 }
 
 const CategoryForm: React.FC<CategoryFormProps> = ({
 	open,
-	category,
+	item,
 	onClose,
 	onSubmit,
 }) => {
 	const getEmptyCategory = (): Category => ({
-		id: 0,
+		id: "",
 		name: "",
 	});
 
@@ -34,7 +34,6 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
 				onChange={handleChange}
 				fullWidth
 				required
-				// Comentário em português: Nome da categoria
 			/>
 		</Grid>
 	);
@@ -43,7 +42,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
 		<GenericForm<Category>
 			open={open}
 			title="Category"
-			item={category}
+			item={item}
 			onClose={onClose}
 			onSubmit={onSubmit}
 			renderFields={renderCategoryFields}

@@ -1,8 +1,19 @@
+import { CategorySchema } from "./Category";
+
 export interface Product {
-	id: number;
+	id: string;
 	name: string;
 	description: string;
 	price: number;
-	categoryName: string;
+	categories: string;
+	imageUrl: string;
+}
+
+export interface ProductSchema {
+	_id: string;
+	name: string;
+	description: string;
+	price: number;
+	categoryIds: CategorySchema[];
 	imageUrl: string;
 }

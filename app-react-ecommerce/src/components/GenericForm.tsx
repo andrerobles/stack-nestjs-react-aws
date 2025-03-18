@@ -6,6 +6,7 @@ import {
 	DialogActions,
 	Button,
 	Grid,
+	CircularProgress,
 } from "@mui/material";
 
 interface GenericFormProps<T> {
@@ -13,7 +14,7 @@ interface GenericFormProps<T> {
 	title: string;
 	item: T | null;
 	onClose: () => void;
-	onSubmit: (item: T) => void;
+	onSubmit: (item: T) => Promise<void>; // Alterado para Promise<void>
 	renderFields: (
 		item: T,
 		handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
@@ -32,10 +33,15 @@ function GenericForm<T>({
 }: GenericFormProps<T>) {
 	// Usamos o item fornecido ou criamos um novo se for nulo
 	const [formData, setFormData] = React.useState<T>(item || getEmptyItem());
+	const [isSubmitting, setIsSubmitting] = React.useState(false);
 
+	// Atualiza o formulário quando o item muda
 	React.useEffect(() => {
-		setFormData(item || getEmptyItem());
-	}, [item]);
+		if (open) {
+			// Só atualiza quando o diálogo está aberto
+			setFormData(item || getEmptyItem());
+		}
+	}, [item, open]);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value, type } = e.target;
@@ -46,9 +52,18 @@ function GenericForm<T>({
 		});
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		onSubmit(formData);
+		setIsSubmitting(true);
+
+		try {
+			await onSubmit(formData);
+			onClose();
+		} catch (error) {
+			console.error("Error submitting form:", error);
+		} finally {
+			setIsSubmitting(false);
+		}
 	};
 
 	return (
@@ -61,11 +76,22 @@ function GenericForm<T>({
 					</Grid>
 				</DialogContent>
 				<DialogActions>
-					<Button onClick={onClose} color="primary">
+					<Button onClick={onClose} color="primary" disabled={isSubmitting}>
 						Cancel
 					</Button>
-					<Button type="submit" color="primary" variant="contained">
-						{item ? "Update" : "Create"}
+					<Button
+						type="submit"
+						color="primary"
+						variant="contained"
+						disabled={isSubmitting}
+					>
+						{isSubmitting ? (
+							<CircularProgress size={24} color="inherit" />
+						) : item ? (
+							"Update"
+						) : (
+							"Create"
+						)}
 					</Button>
 				</DialogActions>
 			</form>
