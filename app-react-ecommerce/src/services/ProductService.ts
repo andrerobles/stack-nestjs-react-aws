@@ -55,7 +55,7 @@ export const ProductService = {
 			if (axios.isAxiosError(error) && error.response?.status === 404) {
 				return undefined;
 			}
-			console.error(`Failed to fetch category with id ${id}:`, error);
+			console.error(`Failed to fetch product with id ${id}:`, error);
 			throw error;
 		}
 	},
@@ -65,7 +65,7 @@ export const ProductService = {
 		product: Omit<Product, "id">
 	): Promise<Product | undefined> => {
 		try {
-			const response = await api.post("/product", {
+			const response = await api.post("/products", {
 				name: product.name,
 				description: product.description,
 				price: product.price,
@@ -84,7 +84,7 @@ export const ProductService = {
 				};
 			}
 		} catch (error) {
-			console.error("Failed to create category:", error);
+			console.error("Failed to create product:", error);
 			throw error;
 		}
 	},
@@ -94,7 +94,7 @@ export const ProductService = {
 		product: Partial<ProductSchema>
 	): Promise<Product | undefined> => {
 		try {
-			const response = await api.patch(`/categories/${id}`, {
+			const response = await api.patch(`/products/${id}`, {
 				name: product.name,
 				description: product.description,
 				price: product.price,
@@ -114,7 +114,7 @@ export const ProductService = {
 				};
 			}
 		} catch (error) {
-			console.error(`Failed to update category with id ${id}:`, error);
+			console.error(`Failed to update product with id ${id}:`, error);
 			throw error;
 		}
 	},

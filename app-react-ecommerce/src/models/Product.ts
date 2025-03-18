@@ -17,3 +17,7 @@ export interface ProductSchema {
 	categoryIds: CategorySchema[];
 	imageUrl: string;
 }
+
+export const convertProductsToString = (products: ProductSchema[]): string => {
+	return products.map((product) => product.name).join(", ");
+};

@@ -5,13 +5,13 @@ export type ProductName = string;
 export interface Order {
 	id: string;
 	date: Date;
-	products: ProductName[];
+	products: string;
 	total: number;
 }
 
 export interface OrderSchema {
 	_id: string;
 	date: Date;
-	productIds: ProductSchema;
+	productIds: ProductSchema[];
 	total: number;
 }

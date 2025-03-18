@@ -7,14 +7,10 @@ import {
 	TextField,
 	Button,
 	Grid,
-	List,
-	ListItem,
-	ListItemText,
-	ListItemSecondaryAction,
-	IconButton,
 	Typography,
+	Chip,
+	Box,
 } from "@mui/material";
-import { Delete as DeleteIcon } from "@mui/icons-material";
 import { Order } from "../models/Order";
 
 interface OrderFormProps {
@@ -31,24 +27,29 @@ const OrderForm: React.FC<OrderFormProps> = ({
 	onSubmit,
 }) => {
 	const [formData, setFormData] = useState<Order>({
-		id: 0,
+		id: "",
 		date: new Date(),
-		products: [],
+		products: "", // Agora é uma string
 		total: 0,
 	});
 
 	const [newProduct, setNewProduct] = useState("");
+	// Array temporário para gerenciar os produtos na interface
+	const [productList, setProductList] = useState<string[]>([]);
 
 	useEffect(() => {
 		if (item) {
 			setFormData(item);
+			// Se products for uma string, convertemos para array para exibição
+			setProductList(item.products ? item.products.split(", ") : []);
 		} else {
 			setFormData({
-				id: 0,
+				id: "",
 				date: new Date(),
-				products: [],
+				products: "",
 				total: 0,
 			});
+			setProductList([]);
 		}
 	}, [item]);
 
@@ -70,20 +71,30 @@ const OrderForm: React.FC<OrderFormProps> = ({
 
 	const handleAddProduct = () => {
 		if (newProduct.trim()) {
+			// Adiciona ao array temporário
+			const updatedProducts = [...productList, newProduct.trim()];
+			setProductList(updatedProducts);
+
+			// Atualiza o formData com a string de produtos separados por vírgula
 			setFormData({
 				...formData,
-				products: [...formData.products, newProduct.trim()],
+				products: updatedProducts.join(", "),
 			});
+
 			setNewProduct("");
 		}
 	};
 
 	const handleRemoveProduct = (index: number) => {
-		const updatedProducts = [...formData.products];
+		// Remove do array temporário
+		const updatedProducts = [...productList];
 		updatedProducts.splice(index, 1);
+		setProductList(updatedProducts);
+
+		// Atualiza o formData com a string atualizada
 		setFormData({
 			...formData,
-			products: updatedProducts,
+			products: updatedProducts.join(", "),
 		});
 	};
 
@@ -125,7 +136,6 @@ const OrderForm: React.FC<OrderFormProps> = ({
 								value={newProduct}
 								onChange={(e) => setNewProduct(e.target.value)}
 								fullWidth
-								// Comentário em português: Nome do produto
 							/>
 						</Grid>
 						<Grid item xs={4}>
@@ -139,24 +149,29 @@ const OrderForm: React.FC<OrderFormProps> = ({
 							</Button>
 						</Grid>
 						<Grid item xs={12}>
-							<List>
-								{formData.products.map((product, index) => (
-									<ListItem key={index}>
-										<ListItemText primary={product} />
-										<ListItemSecondaryAction>
-											<IconButton
-												edge="end"
-												color="secondary"
-												onClick={() => handleRemoveProduct(index)}
-											>
-												<DeleteIcon />
-											</IconButton>
-										</ListItemSecondaryAction>
-									</ListItem>
-								))}
-							</List>
+							{productList.length > 0 ? (
+								<Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 2 }}>
+									{productList.map((product, index) => (
+										<Chip
+											key={index}
+											label={product}
+											onDelete={() => handleRemoveProduct(index)}
+											color="primary"
+											variant="outlined"
+										/>
+									))}
+								</Box>
+							) : (
+								<Typography
+									variant="body2"
+									color="textSecondary"
+									sx={{ mt: 2 }}
+								>
+									No products added yet
+								</Typography>
+							)}
 						</Grid>
-						<Grid item xs={12}>
+						<Grid item xs={12} sx={{ mt: 2 }}>
 							<TextField
 								name="total"
 								label="Total"
@@ -178,7 +193,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
 						type="submit"
 						color="primary"
 						variant="contained"
-						disabled={formData.products.length === 0 || formData.total <= 0}
+						disabled={productList.length === 0 || formData.total <= 0}
 					>
 						{item ? "Update" : "Create"}
 					</Button>

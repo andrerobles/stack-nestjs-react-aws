@@ -1,57 +1,8 @@
 import React from "react";
-import {
-	Box,
-	IconButton,
-	Collapse,
-	Typography,
-	List,
-	ListItem,
-	ListItemText,
-} from "@mui/material";
-import {
-	KeyboardArrowDown as KeyboardArrowDownIcon,
-	KeyboardArrowUp as KeyboardArrowUpIcon,
-} from "@mui/icons-material";
 import OrderForm from "./OrderForm";
-import { Order, ProductName } from "../models/Order";
+import { Order } from "../models/Order";
 import GenericTable, { Column } from "../components/GenericTable";
 import { OrderService } from "../services/OrderService";
-
-// Componente para linha expansível
-const ExpandableRow = ({
-	item,
-	value,
-}: {
-	item: Order;
-	value: ProductName[];
-}) => {
-	const [open, setOpen] = React.useState(false);
-
-	return (
-		<Box>
-			<Box display="flex" alignItems="center">
-				<IconButton size="small" onClick={() => setOpen(!open)}>
-					{open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-				</IconButton>
-				<span>{value.length} items</span>
-			</Box>
-			<Collapse in={open} timeout="auto" unmountOnExit>
-				<Box sx={{ margin: 1 }}>
-					<Typography variant="h6" gutterBottom component="div">
-						Products
-					</Typography>
-					<List dense>
-						{value.map((productName, index) => (
-							<ListItem key={index}>
-								<ListItemText primary={productName} />
-							</ListItem>
-						))}
-					</List>
-				</Box>
-			</Collapse>
-		</Box>
-	);
-};
 
 const OrderTable: React.FC = () => {
 	// Definição das colunas para a tabela de pedidos
@@ -67,7 +18,6 @@ const OrderTable: React.FC = () => {
 			id: "products",
 			label: "Products",
 			minWidth: 200,
-			format: (value, item) => <ExpandableRow item={item} value={value} />,
 		},
 		{
 			id: "total",

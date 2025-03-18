@@ -1,47 +1,116 @@
-import { mockOrders } from "../assets/mocks/OrderMock";
-import { Order } from "../models/Order";
+import axios from "axios";
+import { Order, OrderSchema } from "../models/Order";
+import { convertProductsToString } from "../models/Product";
+
+const API_URL = import.meta.env.REACT_APP_API_URL || "http://localhost:3000";
+
+const api = axios.create({
+	baseURL: API_URL,
+	headers: {
+		"Content-Type": "application/json",
+	},
+});
 
 export const OrderService = {
-	getAll: (): Promise<Order[]> => {
-		return Promise.resolve([...mockOrders]);
-	},
+	getAll: async (): Promise<Order[] | undefined> => {
+		try {
+			const response = await api.get("/orders");
 
-	getById: (id: number): Promise<Order | undefined> => {
-		const order = mockOrders.find((o) => o.id === id);
-		return Promise.resolve(order);
-	},
-
-	create: (order: Omit<Order, "id">): Promise<Order> => {
-		// Simulando geração de ID
-		const newId = Math.max(...mockOrders.map((o) => o.id)) + 1;
-		const newOrder = { ...order, id: newId };
-		mockOrders.push(newOrder);
-
-		// Ordenar pedidos por data (mais recentes primeiro)
-		mockOrders.sort((a, b) => b.date.getTime() - a.date.getTime());
-
-		return Promise.resolve(newOrder);
-	},
-
-	update: (order: Order): Promise<Order> => {
-		const index = mockOrders.findIndex((o) => o.id === order.id);
-		if (index !== -1) {
-			mockOrders[index] = order;
-
-			// Ordenar pedidos por data (mais recentes primeiro)
-			mockOrders.sort((a, b) => b.date.getTime() - a.date.getTime());
-
-			return Promise.resolve(order);
+			if (response.data) {
+				const orderResponse: OrderSchema[] = response.data;
+				// Adapta retorno para o padrão
+				return orderResponse.map((order: OrderSchema) => ({
+					id: order._id,
+					date: order.date,
+					products: convertProductsToString(order.productIds),
+					total: order.total,
+				}));
+			}
+		} catch (error) {
+			console.error("Failed to fetch orders:", error);
+			throw error;
 		}
-		return Promise.reject(new Error("Order not found"));
 	},
 
-	delete: (id: number): Promise<boolean> => {
-		const index = mockOrders.findIndex((o) => o.id === id);
-		if (index !== -1) {
-			mockOrders.splice(index, 1);
-			return Promise.resolve(true);
+	// O método getById também deve formatar o resultado
+	getById: async (id: string): Promise<Order | undefined> => {
+		try {
+			const response = await api.get(`/orders/${id}`);
+			if (response.data) {
+				if (response.data) {
+					const orderResponse: OrderSchema = response.data;
+					return {
+						id: orderResponse._id,
+						date: orderResponse.date,
+						products: convertProductsToString(orderResponse.productIds),
+						total: orderResponse.total,
+					};
+				}
+			}
+		} catch (error) {
+			if (axios.isAxiosError(error) && error.response?.status === 404) {
+				return undefined;
+			}
+			console.error(`Failed to fetch order with id ${id}:`, error);
+			throw error;
 		}
-		return Promise.reject(new Error("Order not found"));
+	},
+
+	create: async (order: Omit<Order, "id">): Promise<Order | undefined> => {
+		try {
+			const response = await api.post("/product", {
+				date: order.date,
+				productIds: order.products,
+				total: order.total,
+			});
+			if (response.data) {
+				const orderSchema: OrderSchema = response.data;
+				return {
+					id: orderSchema._id,
+					date: orderSchema.date,
+					products: convertProductsToString(orderSchema.productIds),
+					total: orderSchema.total,
+				};
+			}
+		} catch (error) {
+			console.error("Failed to create order:", error);
+			throw error;
+		}
+	},
+
+	update: async (
+		id: string,
+		order: Partial<OrderSchema>
+	): Promise<Order | undefined> => {
+		try {
+			const response = await api.patch(`/orders/${id}`, {
+				date: order.date,
+				productIds: order.productIds,
+				total: order.total,
+			});
+
+			if (response.data) {
+				const orderResponse: OrderSchema = response.data;
+				return {
+					id: orderResponse._id,
+					date: orderResponse.date,
+					products: convertProductsToString(orderResponse.productIds),
+					total: orderResponse.total,
+				};
+			}
+		} catch (error) {
+			console.error(`Failed to update order with id ${id}:`, error);
+			throw error;
+		}
+	},
+
+	delete: async (id: string): Promise<boolean> => {
+		try {
+			await api.delete(`/orders/${id}`);
+			return true;
+		} catch (error) {
+			console.error(`Failed to delete order with id ${id}:`, error);
+			throw error;
+		}
 	},
 };
