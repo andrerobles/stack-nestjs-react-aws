@@ -24,7 +24,8 @@ export const ProductService = {
 					name: product.name,
 					description: product.description,
 					price: product.price,
-					categories: convertCategoriesToString(product.categoryIds),
+					categoryText: convertCategoriesToString(product.categoryIds),
+					categoryList: product.categoryIds.map((c) => c._id),
 					imageUrl: product.imageUrl,
 				}));
 			}
@@ -46,7 +47,10 @@ export const ProductService = {
 						name: productResponse.name,
 						price: productResponse.price,
 						description: productResponse.description,
-						categories: convertCategoriesToString(productResponse.categoryIds),
+						categoryText: convertCategoriesToString(
+							productResponse.categoryIds
+						),
+						categoryList: productResponse.categoryIds.map((c) => c._id),
 						imageUrl: productResponse.imageUrl,
 					};
 				}
@@ -69,7 +73,7 @@ export const ProductService = {
 				name: product.name,
 				description: product.description,
 				price: product.price,
-				categoryIds: product.categories,
+				categoryIds: product.categoryList,
 				imageUrl: product.imageUrl,
 			});
 			if (response.data) {
@@ -79,7 +83,8 @@ export const ProductService = {
 					name: productResponse.name,
 					description: productResponse.description,
 					price: productResponse.price,
-					categories: convertCategoriesToString(productResponse.categoryIds),
+					categoryText: convertCategoriesToString(productResponse.categoryIds),
+					categoryList: productResponse.categoryIds.map((c) => c._id),
 					imageUrl: productResponse.imageUrl,
 				};
 			}
@@ -91,14 +96,14 @@ export const ProductService = {
 
 	update: async (
 		id: string,
-		product: Partial<ProductResponse>
+		product: Partial<Product>
 	): Promise<Product | undefined> => {
 		try {
 			const response = await api.patch(`/products/${id}`, {
 				name: product.name,
 				description: product.description,
 				price: product.price,
-				categoryIds: product.categoryIds,
+				categoryIds: product.categoryList,
 				imageUrl: product.imageUrl,
 			});
 
@@ -109,7 +114,8 @@ export const ProductService = {
 					name: productResponse.name,
 					description: productResponse.description,
 					price: productResponse.price,
-					categories: convertCategoriesToString(productResponse.categoryIds),
+					categoryText: convertCategoriesToString(productResponse.categoryIds),
+					categoryList: productResponse.categoryIds.map((c) => c._id),
 					imageUrl: productResponse.imageUrl,
 				};
 			}

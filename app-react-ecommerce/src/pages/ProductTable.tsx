@@ -17,7 +17,7 @@ const ProductTable: React.FC = () => {
 			minWidth: 100,
 			format: (value) => `$${value.toFixed(2)}`,
 		},
-		{ id: "categories", label: "Categoria", minWidth: 120 },
+		{ id: "categoryText", label: "Categoria", minWidth: 120 },
 		{
 			id: "imageUrl",
 			label: "Image",
