@@ -7,12 +7,13 @@ import {
 	Button,
 	Grid,
 	CircularProgress,
+	Box,
 } from "@mui/material";
 
 interface GenericFormProps<T> {
 	open: boolean;
 	title: string;
-	item: T | null;
+	item: T | undefined;
 	onClose: () => void;
 	onSubmit: (item: T) => Promise<void>; // Alterado para Promise<void>
 	renderFields: (
@@ -20,6 +21,7 @@ interface GenericFormProps<T> {
 		handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 	) => React.ReactNode;
 	getEmptyItem: () => T;
+	loading?: boolean; // Add loading prop
 }
 
 function GenericForm<T>({
@@ -30,6 +32,7 @@ function GenericForm<T>({
 	onSubmit,
 	renderFields,
 	getEmptyItem,
+	loading = false, // Default to false
 }: GenericFormProps<T>) {
 	// Usamos o item fornecido ou criamos um novo se for nulo
 	const [formData, setFormData] = React.useState<T>(item || getEmptyItem());
@@ -68,26 +71,38 @@ function GenericForm<T>({
 
 	return (
 		<Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-			<DialogTitle>{item ? `Edit ${title}` : `Add New ${title}`}</DialogTitle>
+			<DialogTitle>
+				{item && item.id ? `Edit ${title}` : `Add New ${title}`}
+			</DialogTitle>
 			<form onSubmit={handleSubmit}>
 				<DialogContent>
-					<Grid container spacing={2}>
-						{renderFields(formData, handleChange)}
-					</Grid>
+					{loading ? (
+						<Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
+							<CircularProgress />
+						</Box>
+					) : (
+						<Grid container spacing={2}>
+							{renderFields(formData, handleChange)}
+						</Grid>
+					)}
 				</DialogContent>
 				<DialogActions>
-					<Button onClick={onClose} color="primary" disabled={isSubmitting}>
+					<Button
+						onClick={onClose}
+						color="primary"
+						disabled={isSubmitting || loading}
+					>
 						Cancel
 					</Button>
 					<Button
 						type="submit"
 						color="primary"
 						variant="contained"
-						disabled={isSubmitting}
+						disabled={isSubmitting || loading}
 					>
 						{isSubmitting ? (
 							<CircularProgress size={24} color="inherit" />
-						) : item ? (
+						) : item && item.id ? (
 							"Update"
 						) : (
 							"Create"

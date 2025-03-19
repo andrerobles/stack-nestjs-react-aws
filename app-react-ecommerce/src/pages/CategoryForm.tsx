@@ -1,21 +1,48 @@
-import React from "react";
-import { TextField, Grid } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { TextField, Grid, CircularProgress } from "@mui/material";
 import { Category } from "../models/Category";
 import GenericForm from "../components/GenericForm";
+import { CategoryService } from "../services/CategoryService";
 
 interface CategoryFormProps {
 	open: boolean;
-	item: Category | null;
+	itemId: string | null; // Changed from item: Category | null
 	onClose: () => void;
 	onSubmit: (category: Category) => Promise<void>;
 }
 
 const CategoryForm: React.FC<CategoryFormProps> = ({
 	open,
-	item,
+	itemId,
 	onClose,
 	onSubmit,
 }) => {
+	const [loading, setLoading] = useState(false);
+	const [item, setItem] = useState<Category | undefined>();
+
+	// Fetch item when itemId changes
+	useEffect(() => {
+		const fetchItem = async () => {
+			if (itemId) {
+				setLoading(true);
+				try {
+					const fetchedItem = await CategoryService.getById(itemId);
+					setItem(fetchedItem);
+				} catch (error) {
+					console.error("Error fetching category:", error);
+				} finally {
+					setLoading(false);
+				}
+			} else {
+				setItem(null);
+			}
+		};
+
+		if (open) {
+			fetchItem();
+		}
+	}, [itemId, open]);
+
 	const getEmptyCategory = (): Category => ({
 		id: "",
 		name: "",
@@ -26,14 +53,18 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
 		handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 	) => (
 		<Grid item xs={12}>
-			<TextField
-				name="name"
-				label="Category Name"
-				value={formData.name}
-				onChange={handleChange}
-				fullWidth
-				required
-			/>
+			{loading ? (
+				<CircularProgress />
+			) : (
+				<TextField
+					name="name"
+					label="Category Name"
+					value={formData.name}
+					onChange={handleChange}
+					fullWidth
+					required
+				/>
+			)}
 		</Grid>
 	);
 
@@ -46,6 +77,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
 			onSubmit={onSubmit}
 			renderFields={renderCategoryFields}
 			getEmptyItem={getEmptyCategory}
+			loading={loading}
 		/>
 	);
 };

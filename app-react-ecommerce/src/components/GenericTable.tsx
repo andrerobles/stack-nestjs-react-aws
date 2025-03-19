@@ -35,7 +35,7 @@ export interface Column<T> {
 
 interface GenericTableProps<T> {
 	title: string;
-	fetchItems: () => Promise<T[]>;
+	fetchItems: () => Promise<T[] | undefined>;
 	columns: Column<T>[];
 	addItem: (item: T) => Promise<void>;
 	updateItem: (item: T) => Promise<void>;
@@ -43,7 +43,7 @@ interface GenericTableProps<T> {
 	getItemId: (item: T) => string;
 	FormComponent: React.ComponentType<{
 		open: boolean;
-		item: T | null;
+		itemId: string | null; // Changed from item: T | null;
 		onClose: () => void;
 		onSubmit: (item: T) => Promise<void>;
 	}>;
@@ -83,7 +83,9 @@ function GenericTable<T>({
 		setLoading(true);
 		try {
 			const data = await fetchItems();
-			setItems(data);
+			if (data) {
+				setItems(data);
+			}
 		} catch (error) {
 			console.error(`Error fetching ${title}:`, error);
 			setNotify({
@@ -106,7 +108,8 @@ function GenericTable<T>({
 	};
 
 	const handleEditClick = (item: T) => {
-		setCurrentItem(item);
+		const itemId = getItemId(item);
+		setCurrentItem({ id: itemId } as unknown as T);
 		setOpenForm(true);
 	};
 
@@ -307,7 +310,7 @@ function GenericTable<T>({
 			{/* Componente de formulário */}
 			<FormComponent
 				open={openForm}
-				item={currentItem}
+				itemId={currentItem ? getItemId(currentItem) : null}
 				onClose={handleFormClose}
 				onSubmit={handleFormSubmit}
 			/>
