@@ -1,4 +1,3 @@
-// src/components/category/CategoryForm.tsx
 import React from "react";
 import { TextField, Grid } from "@mui/material";
 import { Category } from "../models/Category";

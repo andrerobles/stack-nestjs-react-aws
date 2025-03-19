@@ -1,4 +1,4 @@
-import { CategorySchema } from "./Category";
+import { CategoryResponse } from "./Category";
 
 export interface Product {
 	id: string;
@@ -9,15 +9,17 @@ export interface Product {
 	imageUrl: string;
 }
 
-export interface ProductSchema {
+export interface ProductResponse {
 	_id: string;
 	name: string;
 	description: string;
 	price: number;
-	categoryIds: CategorySchema[];
+	categoryIds: CategoryResponse[];
 	imageUrl: string;
 }
 
-export const convertProductsToString = (products: ProductSchema[]): string => {
+export const convertProductsToString = (
+	products: ProductResponse[]
+): string => {
 	return products.map((product) => product.name).join(", ");
 };

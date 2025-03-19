@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Category, CategorySchema } from "../models/Category";
+import { Category, CategoryResponse } from "../models/Category";
 
 const API_URL = import.meta.env.REACT_APP_API_URL || "http://localhost:3000";
 
@@ -17,9 +17,9 @@ export const CategoryService = {
 			const response = await api.get("/categories");
 
 			if (response.data) {
-				const categoriesResponse: CategorySchema[] = response.data;
+				const categoriesResponse: CategoryResponse[] = response.data;
 				// Adapta retorno para o padrão
-				return categoriesResponse.map((category: CategorySchema) => ({
+				return categoriesResponse.map((category: CategoryResponse) => ({
 					id: category._id,
 					name: category.name,
 				}));
@@ -57,7 +57,7 @@ export const CategoryService = {
 		try {
 			const response = await api.post("/categories", { name: category.name });
 			if (response.data) {
-				const category: CategorySchema = response.data;
+				const category: CategoryResponse = response.data;
 				return {
 					id: category._id,
 					name: category.name,

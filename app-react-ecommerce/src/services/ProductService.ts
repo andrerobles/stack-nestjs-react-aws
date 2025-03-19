@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Product, ProductSchema } from "../models/Product";
+import { Product, ProductResponse } from "../models/Product";
 import { convertCategoriesToString } from "../models/Category";
 
 const API_URL = import.meta.env.REACT_APP_API_URL || "http://localhost:3000";
@@ -17,9 +17,9 @@ export const ProductService = {
 			const response = await api.get("/products");
 
 			if (response.data) {
-				const productsResponse: ProductSchema[] = response.data;
+				const productsResponse: ProductResponse[] = response.data;
 				// Adapta retorno para o padrão
-				return productsResponse.map((product: ProductSchema) => ({
+				return productsResponse.map((product: ProductResponse) => ({
 					id: product._id,
 					name: product.name,
 					description: product.description,
@@ -40,7 +40,7 @@ export const ProductService = {
 			const response = await api.get(`/products/${id}`);
 			if (response.data) {
 				if (response.data) {
-					const productResponse: ProductSchema = response.data;
+					const productResponse: ProductResponse = response.data;
 					return {
 						id: productResponse._id,
 						name: productResponse.name,
@@ -73,7 +73,7 @@ export const ProductService = {
 				imageUrl: product.imageUrl,
 			});
 			if (response.data) {
-				const productResponse: ProductSchema = response.data;
+				const productResponse: ProductResponse = response.data;
 				return {
 					id: productResponse._id,
 					name: productResponse.name,
@@ -91,7 +91,7 @@ export const ProductService = {
 
 	update: async (
 		id: string,
-		product: Partial<ProductSchema>
+		product: Partial<ProductResponse>
 	): Promise<Product | undefined> => {
 		try {
 			const response = await api.patch(`/products/${id}`, {
@@ -103,7 +103,7 @@ export const ProductService = {
 			});
 
 			if (response.data) {
-				const productResponse: ProductSchema = response.data;
+				const productResponse: ProductResponse = response.data;
 				return {
 					id: productResponse._id,
 					name: productResponse.name,

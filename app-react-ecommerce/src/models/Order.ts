@@ -1,4 +1,4 @@
-import { ProductSchema } from "./Product";
+import { ProductResponse } from "./Product";
 
 export type ProductName = string;
 
@@ -9,9 +9,9 @@ export interface Order {
 	total: number;
 }
 
-export interface OrderSchema {
+export interface OrderResponse {
 	_id: string;
 	date: Date;
-	productIds: ProductSchema[];
+	productIds: ProductResponse[];
 	total: number;
 }

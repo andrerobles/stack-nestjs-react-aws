@@ -37,7 +37,9 @@ const OrderTable: React.FC = () => {
 				const { id, ...orderWithoutId } = order;
 				await OrderService.create(orderWithoutId);
 			}}
-			updateItem={OrderService.update}
+			updateItem={async (order) => {
+				await OrderService.update(order.id, order);
+			}}
 			deleteItem={OrderService.delete}
 			getItemId={(order) => order.id}
 			FormComponent={OrderForm}

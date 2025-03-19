@@ -3,13 +3,13 @@ export interface Category {
 	name: string;
 }
 
-export interface CategorySchema {
+export interface CategoryResponse {
 	_id: string;
 	name: string;
 }
 
 export const convertCategoriesToString = (
-	categories: CategorySchema[]
+	categories: CategoryResponse[]
 ): string => {
 	return categories.map((category) => category.name).join(", ");
 };

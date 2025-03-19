@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Order, OrderSchema } from "../models/Order";
+import { Order, OrderResponse } from "../models/Order";
 import { convertProductsToString } from "../models/Product";
 
 const API_URL = import.meta.env.REACT_APP_API_URL || "http://localhost:3000";
@@ -17,9 +17,9 @@ export const OrderService = {
 			const response = await api.get("/orders");
 
 			if (response.data) {
-				const orderResponse: OrderSchema[] = response.data;
+				const orderResponse: OrderResponse[] = response.data;
 				// Adapta retorno para o padrão
-				return orderResponse.map((order: OrderSchema) => ({
+				return orderResponse.map((order: OrderResponse) => ({
 					id: order._id,
 					date: order.date,
 					products: convertProductsToString(order.productIds),
@@ -38,7 +38,7 @@ export const OrderService = {
 			const response = await api.get(`/orders/${id}`);
 			if (response.data) {
 				if (response.data) {
-					const orderResponse: OrderSchema = response.data;
+					const orderResponse: OrderResponse = response.data;
 					return {
 						id: orderResponse._id,
 						date: orderResponse.date,
@@ -58,13 +58,13 @@ export const OrderService = {
 
 	create: async (order: Omit<Order, "id">): Promise<Order | undefined> => {
 		try {
-			const response = await api.post("/product", {
+			const response = await api.post("/orders", {
 				date: order.date,
 				productIds: order.products,
 				total: order.total,
 			});
 			if (response.data) {
-				const orderSchema: OrderSchema = response.data;
+				const orderSchema: OrderResponse = response.data;
 				return {
 					id: orderSchema._id,
 					date: orderSchema.date,
@@ -80,17 +80,17 @@ export const OrderService = {
 
 	update: async (
 		id: string,
-		order: Partial<OrderSchema>
+		order: Partial<Order>
 	): Promise<Order | undefined> => {
 		try {
 			const response = await api.patch(`/orders/${id}`, {
 				date: order.date,
-				productIds: order.productIds,
+				productIds: order.products,
 				total: order.total,
 			});
 
 			if (response.data) {
-				const orderResponse: OrderSchema = response.data;
+				const orderResponse: OrderResponse = response.data;
 				return {
 					id: orderResponse._id,
 					date: orderResponse.date,

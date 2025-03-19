@@ -7,17 +7,23 @@ import {
 	TextField,
 	Button,
 	Grid,
-	Typography,
+	Select,
+	MenuItem,
+	FormControl,
+	InputLabel,
 	Chip,
 	Box,
+	Typography,
 } from "@mui/material";
 import { Order } from "../models/Order";
+import { ProductService } from "../services/ProductService";
+import { Product } from "../models/Product";
 
 interface OrderFormProps {
 	open: boolean;
 	item: Order | null;
 	onClose: () => void;
-	onSubmit: (order: Order) => Promise<void>;
+	onSubmit: (order: Order, id?: string) => Promise<void>;
 }
 
 const OrderForm: React.FC<OrderFormProps> = ({
@@ -29,14 +35,37 @@ const OrderForm: React.FC<OrderFormProps> = ({
 	const [formData, setFormData] = useState<Order>({
 		id: "",
 		date: new Date(),
-		products: "", // Agora é uma string
+		products: "",
 		total: 0,
 	});
 
-	const [newProduct, setNewProduct] = useState("");
-	// Array temporário para gerenciar os produtos na interface
+	const [selectedProductId, setSelectedProductId] = useState<string>("");
 	const [productList, setProductList] = useState<string[]>([]);
+	const [availableProducts, setAvailableProducts] = useState<
+		Product[] | undefined
+	>(undefined);
+	const [loading, setLoading] = useState<boolean>(false);
 
+	// Carregar produtos disponíveis
+	useEffect(() => {
+		const loadProducts = async () => {
+			setLoading(true);
+			try {
+				const products = await ProductService.getAll();
+				setAvailableProducts(products);
+			} catch (error) {
+				console.error("Failed to load products:", error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		if (open) {
+			loadProducts();
+		}
+	}, [open]);
+
+	// Carregar dados do pedido quando o item mudar
 	useEffect(() => {
 		if (item) {
 			setFormData(item);
@@ -69,19 +98,29 @@ const OrderForm: React.FC<OrderFormProps> = ({
 		}
 	};
 
+	const handleProductChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+		setSelectedProductId(e.target.value as string);
+	};
+
 	const handleAddProduct = () => {
-		if (newProduct.trim()) {
-			// Adiciona ao array temporário
-			const updatedProducts = [...productList, newProduct.trim()];
-			setProductList(updatedProducts);
+		if (selectedProductId) {
+			const selectedProduct = availableProducts?.find(
+				(p) => p.id === selectedProductId
+			);
 
-			// Atualiza o formData com a string de produtos separados por vírgula
-			setFormData({
-				...formData,
-				products: updatedProducts.join(", "),
-			});
+			if (selectedProduct) {
+				// Adiciona ao array temporário
+				const updatedProducts = [...productList, selectedProduct.name];
+				setProductList(updatedProducts);
 
-			setNewProduct("");
+				// Atualiza o formData com a string de produtos separados por vírgula
+				setFormData({
+					...formData,
+					products: updatedProducts.join(", "),
+				});
+
+				setSelectedProductId("");
+			}
 		}
 	};
 
@@ -124,19 +163,31 @@ const OrderForm: React.FC<OrderFormProps> = ({
 								InputLabelProps={{
 									shrink: true,
 								}}
-								// Comentário em português: Data do pedido
 							/>
 						</Grid>
 						<Grid item xs={12}>
 							<Typography variant="h6">Products</Typography>
 						</Grid>
 						<Grid item xs={8}>
-							<TextField
-								label="Product Name"
-								value={newProduct}
-								onChange={(e) => setNewProduct(e.target.value)}
-								fullWidth
-							/>
+							<FormControl fullWidth>
+								<InputLabel id="product-select-label">
+									Select Product
+								</InputLabel>
+								<Select
+									labelId="product-select-label"
+									id="product-select"
+									value={selectedProductId}
+									onChange={handleProductChange}
+									label="Select Product"
+									disabled={loading}
+								>
+									{availableProducts?.map((product) => (
+										<MenuItem key={product.id} value={product.id}>
+											{product.name}
+										</MenuItem>
+									))}
+								</Select>
+							</FormControl>
 						</Grid>
 						<Grid item xs={4}>
 							<Button
@@ -144,6 +195,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
 								color="primary"
 								onClick={handleAddProduct}
 								fullWidth
+								disabled={!selectedProductId || loading}
 							>
 								Add Product
 							</Button>
@@ -171,7 +223,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
 								</Typography>
 							)}
 						</Grid>
-						<Grid item xs={12} sx={{ mt: 2 }}>
+						<Grid item xs={12}>
 							<TextField
 								name="total"
 								label="Total"
@@ -180,7 +232,6 @@ const OrderForm: React.FC<OrderFormProps> = ({
 								onChange={handleChange}
 								fullWidth
 								inputProps={{ min: 0, step: 0.01 }}
-								// Comentário em português: Total do pedido
 							/>
 						</Grid>
 					</Grid>

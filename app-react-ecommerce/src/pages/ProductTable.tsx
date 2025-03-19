@@ -44,7 +44,9 @@ const ProductTable: React.FC = () => {
 				const { id, ...productWithoutId } = product;
 				await ProductService.create(productWithoutId);
 			}}
-			updateItem={ProductService.update}
+			updateItem={async (product) => {
+				await ProductService.update(product.id, product);
+			}}
 			deleteItem={ProductService.delete}
 			getItemId={(product) => product.id}
 			FormComponent={ProductForm}
