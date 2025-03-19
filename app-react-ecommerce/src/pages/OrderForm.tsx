@@ -14,24 +14,28 @@ import {
 	Chip,
 	Box,
 	Typography,
+	CircularProgress,
 } from "@mui/material";
 import { Order } from "../models/Order";
 import { ProductService } from "../services/ProductService";
+import { OrderService } from "../services/OrderService";
 import { Product } from "../models/Product";
 
 interface OrderFormProps {
 	open: boolean;
-	item: Order | null;
+	itemId: string | null; // Changed from item: Order | null
 	onClose: () => void;
-	onSubmit: (order: Order, id?: string) => Promise<void>;
+	onSubmit: (order: Order) => Promise<void>;
 }
 
 const OrderForm: React.FC<OrderFormProps> = ({
 	open,
-	item,
+	itemId,
 	onClose,
 	onSubmit,
 }) => {
+	const [loading, setLoading] = useState<boolean>(false);
+	const [item, setItem] = useState<Order | null>(null);
 	const [formData, setFormData] = useState<Order>({
 		id: "",
 		date: new Date(),
@@ -44,19 +48,53 @@ const OrderForm: React.FC<OrderFormProps> = ({
 	const [availableProducts, setAvailableProducts] = useState<
 		Product[] | undefined
 	>(undefined);
-	const [loading, setLoading] = useState<boolean>(false);
+	const [productsLoading, setProductsLoading] = useState<boolean>(false);
+
+	// Fetch order when itemId changes
+	useEffect(() => {
+		const fetchItem = async () => {
+			if (itemId) {
+				setLoading(true);
+				try {
+					const fetchedItem = await OrderService.getById(itemId);
+					setItem(fetchedItem);
+					setFormData(fetchedItem);
+					setProductList(
+						fetchedItem.products ? fetchedItem.products.split(", ") : []
+					);
+				} catch (error) {
+					console.error("Error fetching order:", error);
+				} finally {
+					setLoading(false);
+				}
+			} else {
+				setItem(null);
+				setFormData({
+					id: "",
+					date: new Date(),
+					products: "",
+					total: 0,
+				});
+				setProductList([]);
+			}
+		};
+
+		if (open) {
+			fetchItem();
+		}
+	}, [itemId, open]);
 
 	// Carregar produtos disponíveis
 	useEffect(() => {
 		const loadProducts = async () => {
-			setLoading(true);
+			setProductsLoading(true);
 			try {
 				const products = await ProductService.getAll();
 				setAvailableProducts(products);
 			} catch (error) {
 				console.error("Failed to load products:", error);
 			} finally {
-				setLoading(false);
+				setProductsLoading(false);
 			}
 		};
 
@@ -64,23 +102,6 @@ const OrderForm: React.FC<OrderFormProps> = ({
 			loadProducts();
 		}
 	}, [open]);
-
-	// Carregar dados do pedido quando o item mudar
-	useEffect(() => {
-		if (item) {
-			setFormData(item);
-			// Se products for uma string, convertemos para array para exibição
-			setProductList(item.products ? item.products.split(", ") : []);
-		} else {
-			setFormData({
-				id: "",
-				date: new Date(),
-				products: "",
-				total: 0,
-			});
-			setProductList([]);
-		}
-	}, [item]);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value, type } = e.target;
@@ -142,6 +163,18 @@ const OrderForm: React.FC<OrderFormProps> = ({
 		onSubmit(formData);
 	};
 
+	if (loading) {
+		return (
+			<Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+				<DialogContent>
+					<Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
+						<CircularProgress />
+					</Box>
+				</DialogContent>
+			</Dialog>
+		);
+	}
+
 	return (
 		<Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
 			<DialogTitle>{item ? "Edit Order" : "Add New Order"}</DialogTitle>
@@ -179,7 +212,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
 									value={selectedProductId}
 									onChange={handleProductChange}
 									label="Select Product"
-									disabled={loading}
+									disabled={productsLoading}
 								>
 									{availableProducts?.map((product) => (
 										<MenuItem key={product.id} value={product.id}>
@@ -195,7 +228,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
 								color="primary"
 								onClick={handleAddProduct}
 								fullWidth
-								disabled={!selectedProductId || loading}
+								disabled={!selectedProductId || productsLoading}
 							>
 								Add Product
 							</Button>
